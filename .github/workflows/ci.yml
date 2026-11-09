@@ -1,0 +1,67 @@
+name: Template CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # enable manual execution
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-template:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install stable Rust
+        run: |
+          rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+          rustup default stable
+
+      - name: Install cargo-generate
+        run: cargo install cargo-generate --version 0.23.9 --locked
+
+      - name: Generate a sample project
+        working-directory: ${{ runner.temp }}
+        run: cargo generate --path "$GITHUB_WORKSPACE" --name template-smoke-test --vcs none --no-workspace
+
+      - name: Check generated layout
+        working-directory: ${{ runner.temp }}/template-smoke-test
+        run: |
+          test -f .github/workflows/rust.yml
+          test ! -e .github/workflows/ci.yml
+          test ! -e .github/workflows/rust.yml.liquid
+          test ! -e cargo-generate.toml
+
+      - name: Lint template and generated workflows
+        uses: raven-actions/actionlint@v2
+        with:
+          files: .github/workflows/ci.yml, ${{ runner.temp }}/template-smoke-test/.github/workflows/rust.yml
+
+      - name: Check generated formatting
+        working-directory: ${{ runner.temp }}/template-smoke-test
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        working-directory: ${{ runner.temp }}/template-smoke-test
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Unit, integration, property and documentation tests
+        working-directory: ${{ runner.temp }}/template-smoke-test
+        run: cargo test --all-features
+
+      - name: Build generated executable
+        working-directory: ${{ runner.temp }}/template-smoke-test
+        run: cargo build --release

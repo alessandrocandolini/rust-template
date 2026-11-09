@@ -1,3 +1,5 @@
+[![CI](https://github.com/alessandrocandolini/rust-template/actions/workflows/ci.yml/badge.svg)](https://github.com/alessandrocandolini/rust-template/actions/workflows/ci.yml)
+
 # Rust starter template
 
 Opinionated `cargo-generate` template with PBT, GHA, etc
@@ -5,6 +7,10 @@ Opinionated `cargo-generate` template with PBT, GHA, etc
 Assuming the `cargo-generate` engine is installed in the system (e.g., via nix), a new project folder can be generated using
 ```sh
 cargo generate alessandrocandolini/rust-template --name <name>
+```
+or using SSH keys
+```
+cargo generate --git ssh://git@github.com/alessandrocandolini/rust-template.git --name <name>
 ```
 
 or if the template is available locally under `~/rust-template`,

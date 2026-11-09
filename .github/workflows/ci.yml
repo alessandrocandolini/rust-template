@@ -27,7 +27,7 @@ jobs:
 
       - name: Install stable Rust
         run: |
-          rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+          rustup toolchain install stable --profile minimal --component rustfmt --component clippy --component llvm-tools-preview
           rustup default stable
 
       - name: Install cargo-generate
@@ -49,6 +49,23 @@ jobs:
           IFS= read -r heading < README.md
           test "$heading" = "# template-smoke-test"
 
+      - name: Cache generated project dependencies and build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ runner.temp }}/template-smoke-test -> target
+
+      - name: Install act
+        run: |
+          curl --fail --location --silent --show-error \
+            https://github.com/nektos/act/releases/latest/download/act_Linux_x86_64.tar.gz \
+            --output "$RUNNER_TEMP/act.tar.gz"
+          tar -xzf "$RUNNER_TEMP/act.tar.gz" -C "$RUNNER_TEMP" act
+          "$RUNNER_TEMP/act" --version
+
+      - name: Validate generated workflow with act
+        working-directory: ${{ runner.temp }}/template-smoke-test
+        run: '"$RUNNER_TEMP/act" -n -W .github/workflows/rust.yml -P ubuntu-latest=catthehacker/ubuntu:act-24.04'
+
       - name: Lint template and generated workflows
         uses: raven-actions/actionlint@v2
         with:
@@ -69,3 +86,14 @@ jobs:
       - name: Build generated executable
         working-directory: ${{ runner.temp }}/template-smoke-test
         run: cargo build --release
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+
+      - name: Generate coverage for the sample project
+        working-directory: ${{ runner.temp }}/template-smoke-test
+        run: |
+          cargo llvm-cov --all-features --lcov --output-path lcov.info
+          test -s lcov.info

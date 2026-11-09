@@ -11,3 +11,8 @@
 *~
 
 # Keep Cargo.lock and proptest regression files for reproducibility.
+
+# Generated coverage reports and profiling data
+/lcov.info
+*.profraw
+*.profdata

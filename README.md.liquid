@@ -1,0 +1,34 @@
+# {{project-name}}
+
+## Run
+
+Run tests:
+```sh
+cargo test
+```
+
+Run via cargo:
+```sh
+cargo run
+```
+
+Build and run executable in release mode
+```sh
+cargo build --release
+./target/release/{{project-name}}
+```
+
+Run formatter:
+```
+cargo fmt
+```
+Use
+```
+cargo fmt -- --check
+```
+to check formatting without changing files.
+
+Run linter:
+```
+cargo clippy --all-targets -- -D warnings
+```

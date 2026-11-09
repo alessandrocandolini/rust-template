@@ -1,5 +1,5 @@
 [template]
 cargo_generate_version = ">=0.23.9"
-include = ["Cargo.toml", "src/**/*.rs", "tests/**/*.rs"]
+include = ["Cargo.toml", "src/**/*.rs", "tests/**/*.rs", "README.md", "README.md.liquid"]
 # Template CI belongs only to this repository, not to generated projects.
 ignore = ["cargo-generate.toml", ".github/workflows/ci.yml", "target", "Cargo.lock"]

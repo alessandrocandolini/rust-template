@@ -44,6 +44,10 @@ jobs:
           test ! -e .github/workflows/ci.yml
           test ! -e .github/workflows/rust.yml.liquid
           test ! -e cargo-generate.toml
+          test -f README.md
+          test ! -e README.md.liquid
+          IFS= read -r heading < README.md
+          test "$heading" = "# template-smoke-test"
 
       - name: Lint template and generated workflows
         uses: raven-actions/actionlint@v2

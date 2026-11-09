@@ -21,7 +21,7 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -31,7 +31,9 @@ jobs:
           rustup default stable
 
       - name: Install cargo-generate
-        run: cargo install cargo-generate --version 0.23.9 --locked
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-generate@0.23.9
 
       - name: Generate a sample project
         working-directory: ${{ runner.temp }}

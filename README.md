@@ -26,3 +26,11 @@ cargo fmt
 cargo clippy --all-targets -- -D warnings
 cargo build --release
 ```
+## Upload test coverage to codecov
+
+⚠️Tokenless upload of code coverage reports to [Codecov](https://app.codecov.io/) is no longer supported by [codecov-action v7](https://github.com/codecov/codecov-action).
+
+In order for the GitHub Actions CI of the generated project to be able to automatically upload the generated test coverage reports to codecov, manually set the `CODECOV_TOKEN` repository secret in GitHub. 
+
+The token can be found in Codecov under `Settings` > `Global Upload Token`.
+The secret can be set in github repo under `Settings > Secrets and variables > Actions > new secret`. 
